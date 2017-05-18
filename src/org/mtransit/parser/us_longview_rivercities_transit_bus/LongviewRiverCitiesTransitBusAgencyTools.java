@@ -105,7 +105,8 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 
 	private static final String AMTRAK_GREYHOUND = "Amtrak / Greyhound";
 	private static final String FRED_MEYER = "Fred Meyer";
-	private static final String HERON_POINTE = "Heron Pte";
+	private static final String HERON = "Heron";
+	private static final String HERON_POINTE = HERON + " Pte";
 	private static final String KELSO_HIGH_SCHOOL = "Kelso HS";
 	private static final String RA_LONG_HS = "RA Long HS";
 	private static final String THREE_RIVERS_MALL = "Three Rivers Mall";
@@ -140,7 +141,7 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 				.compileBothTripSort());
 		map2.put(44l, new RouteTripSpec(44l, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND, //
-				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HERON_POINTE) //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HERON) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
 						Arrays.asList(new String[] { "770561", "770554", "770567" })) //
 				.addTripSort(MDirectionType.WEST.intValue(), //

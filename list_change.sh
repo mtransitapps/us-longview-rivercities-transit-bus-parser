@@ -24,16 +24,19 @@ if [ "$RESULT" -gt 0 ]; then
 	git -C $TARGET status | grep "res-current/raw" | head -n 7;
 	exit -1;
 fi
-if [ -e $TARGET/res-next ]; then
-	if [ -e $TARGET/res-next/values/next_gtfs_rts_values_gen.xml ]; then
+if [ -d $TARGET/res-next ]; then
+	git -C $TARGET status | grep "res-next" | head -n 1;
+	if [ -d $TARGET/res-next/values ]; then
 		git -C $TARGET diff res-next/values/next_gtfs_rts_values_gen.xml;
 		checkResult $?;
 	fi
-	RESULT=$(git -C $TARGET diff-index  --name-only HEAD -- "res-next/raw" | wc -l);
-	if [ "$RESULT" -gt 0 ]; then
-		echo "> SCHEDULE CHANGED > MANUAL FIX!";
-		git -C $TARGET status | grep "res-next/raw" | head -n 7;
-		exit -1;
+	if [ -d $TARGET/res-next/raw ]; then
+		RESULT=$(git -C $TARGET diff-index  --name-only HEAD -- "res-next/raw" | wc -l);
+		if [ "$RESULT" -gt 0 ]; then
+			echo "> SCHEDULE CHANGED > MANUAL FIX!";
+			git -C $TARGET status | grep "res-next/raw" | head -n 7;
+			exit -1;
+		fi
 	fi
 fi
 echo "> Listing change... DONE";

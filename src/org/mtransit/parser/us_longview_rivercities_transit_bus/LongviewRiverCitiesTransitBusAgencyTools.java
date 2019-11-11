@@ -1,11 +1,5 @@
 package org.mtransit.parser.us_longview_rivercities_transit_bus;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-
 import org.apache.commons.lang3.StringUtils;
 import org.mtransit.parser.CleanUtils;
 import org.mtransit.parser.DefaultAgencyTools;
@@ -26,6 +20,12 @@ import org.mtransit.parser.mt.data.MRoute;
 import org.mtransit.parser.mt.data.MTrip;
 import org.mtransit.parser.mt.data.MTripStop;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+
 // http://data.trilliumtransit.com/gtfs/rivercitiestransit-wa-us/
 // http://data.trilliumtransit.com/gtfs/rivercitiestransit-wa-us/rivercitiestransit-wa-us.zip
 public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools {
@@ -44,7 +44,7 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 
 	@Override
 	public void start(String[] args) {
-		System.out.printf("\nGenerating RiverCities Transit bus data...");
+		System.out.print("\nGenerating RiverCities Transit bus data...");
 		long start = System.currentTimeMillis();
 		this.serviceIds = extractUsefulServiceIds(args, this, true);
 		super.start(args);
@@ -118,67 +118,84 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 	private static final String TRANSIT_CENTER = "Transit Ctr";
 
 	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
+
 	static {
-		HashMap<Long, RouteTripSpec> map2 = new HashMap<Long, RouteTripSpec>();
-		map2.put(31l, new RouteTripSpec(31l, //
+		HashMap<Long, RouteTripSpec> map2 = new HashMap<>();
+		map2.put(30L, new RouteTripSpec(30L, //
+				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
+				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, "Ocean Beach") //
+				.addTripSort(MDirectionType.EAST.intValue(), //
+						Arrays.asList(
+								"770554", // Ocean Beach Hwy & 28th <=
+								"770668", // ++
+								"770744" // Transit Center
+						)) //
+				.addTripSort(MDirectionType.WEST.intValue(), //
+						Arrays.asList(
+								"770744", // Transit Center
+								"770634", // ++
+								"770554" // Ocean Beach Hwy & 28th =>
+						)) //
+				.compileBothTripSort());
+		map2.put(31L, new RouteTripSpec(31L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, RA_LONG_HS) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "770656", "770666", "770744" })) //
+						Arrays.asList("770656", "770666", "770744")) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "770744", "770634", "770656" })) //
+						Arrays.asList("770744", "770634", "770656")) //
 				.compileBothTripSort());
-		map2.put(32l, new RouteTripSpec(32l, //
+		map2.put(32L, new RouteTripSpec(32L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, FRED_MEYER) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "770699", "770707", "770744" })) //
+						Arrays.asList("770699", "770707", "770744")) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "770744", "770688", "770699" })) //
+						Arrays.asList("770744", "770688", "770699")) //
 				.compileBothTripSort());
-		map2.put(33l, new RouteTripSpec(33l, //
+		map2.put(33L, new RouteTripSpec(33L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HERON_POINTE) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "770561", "770552", "770555", "770744" })) //
+						Arrays.asList("770561", "770552", "770555", "770744")) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "770744", "770732", "770561" })) //
+						Arrays.asList("770744", "770732", "770561")) //
 				.compileBothTripSort());
-		map2.put(44l, new RouteTripSpec(44l, //
+		map2.put(44L, new RouteTripSpec(44L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HERON) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "770561", "770554", "770567" })) //
+						Arrays.asList("770561", "770554", "770567")) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "770567", "770573", "770561" })) //
+						Arrays.asList("770567", "770573", "770561")) //
 				.compileBothTripSort());
-		map2.put(45l, new RouteTripSpec(45l, //
+		map2.put(45L, new RouteTripSpec(45L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "770744", "770580", "770567" })) //
+						Arrays.asList("770744", "770580", "770567")) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "770567", "770585", "770744" })) //
+						Arrays.asList("770567", "770585", "770744")) //
 				.compileBothTripSort());
-		map2.put(56l, new RouteTripSpec(56l, //
+		map2.put(56L, new RouteTripSpec(56L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, THREE_RIVERS_MALL, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "770567", "770655", "770568" })) //
+						Arrays.asList("770567", "770655", "770568")) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "770568", "770615", "770567" })) //
+						Arrays.asList("770568", "770615", "770567")) //
 				.compileBothTripSort());
-		map2.put(57l, new RouteTripSpec(57l, //
+		map2.put(57L, new RouteTripSpec(57L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, KELSO_HIGH_SCHOOL) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList(new String[] { "770636", "770649", //
+						Arrays.asList("770636", "770649", //
 								"770592", "770650", //
-								"770651", "770655", "770567" })) //
+								"770651", "770655", "770567")) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList(new String[] { "770567", "770632", "770569", //
+						Arrays.asList("770567", "770632", "770569", //
 								"781805", "808184", //
-								"770636" })) //
+								"770636")) //
 				.compileBothTripSort());
 		ALL_ROUTE_TRIPS2 = map2;
 	}
@@ -212,7 +229,8 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return; // split
 		}
-		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.getTripHeadsign()), gTrip.getDirectionId());
+		final int directionId = gTrip.getDirectionId() == null ? 0 : gTrip.getDirectionId();
+		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.getTripHeadsign()), directionId);
 	}
 
 	@Override

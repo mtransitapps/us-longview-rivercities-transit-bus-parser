@@ -149,9 +149,19 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, FRED_MEYER) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList("770699", "770707", "770744")) //
+						Arrays.asList(
+							"770700", // 30th  & Larch <=
+							"770699", // 30th & Maryland <=
+							"770707", // ++
+							"770744" // Transit Center
+							)) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList("770744", "770688", "770699")) //
+						Arrays.asList(
+							"770744", // Transit Center
+							"770688", // ++
+							"770699", // 30th & Maryland =>
+							"770700" // 30th  & Larch =>
+							)) //
 				.compileBothTripSort());
 		map2.put(33L, new RouteTripSpec(33L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
@@ -189,13 +199,24 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, KELSO_HIGH_SCHOOL) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
-						Arrays.asList("770636", "770649", //
-								"770592", "770650", //
-								"770651", "770655", "770567")) //
+						Arrays.asList(
+							"770636", // <=
+							"770649", // ==
+							"770592", // !=
+							"770650", // !=
+							"770651", // ==
+							"770685", // Washington Way & 9th Ave
+							"770567" // Amtrak/Greyhound
+							)) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
-						Arrays.asList("770567", "770632", "770569", //
-								"781805", "808184", //
-								"770636")) //
+						Arrays.asList(
+							"770567", // Amtrak/Greyhound
+							"770632", // Mill  & 8th
+							"770569", // ==
+							"781805", // !=
+							"808184", // !=
+							"770636" // =>
+							)) //
 				.compileBothTripSort());
 		ALL_ROUTE_TRIPS2 = map2;
 	}

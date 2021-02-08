@@ -1,8 +1,11 @@
 package org.mtransit.parser.us_longview_rivercities_transit_bus;
 
-import org.apache.commons.lang3.StringUtils;
-import org.mtransit.parser.CleanUtils;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.mtransit.commons.CleanUtils;
+import org.mtransit.commons.StringUtils;
 import org.mtransit.parser.DefaultAgencyTools;
+import org.mtransit.parser.MTLog;
 import org.mtransit.parser.Pair;
 import org.mtransit.parser.SplitUtils;
 import org.mtransit.parser.SplitUtils.RouteTripSpec;
@@ -30,7 +33,7 @@ import java.util.List;
 // http://data.trilliumtransit.com/gtfs/rivercitiestransit-wa-us/rivercitiestransit-wa-us.zip
 public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools {
 
-	public static void main(String[] args) {
+	public static void main(@Nullable String[] args) {
 		if (args == null || args.length == 0) {
 			args = new String[3];
 			args[0] = "input/gtfs.zip";
@@ -40,58 +43,61 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 		new LongviewRiverCitiesTransitBusAgencyTools().start(args);
 	}
 
-	private HashSet<String> serviceIds;
+	@Nullable
+	private HashSet<Integer> serviceIdInts;
 
 	@Override
-	public void start(String[] args) {
-		System.out.print("\nGenerating RiverCities Transit bus data...");
+	public void start(@NotNull String[] args) {
+		MTLog.log("Generating RiverCities Transit bus data...");
 		long start = System.currentTimeMillis();
-		this.serviceIds = extractUsefulServiceIds(args, this, true);
+		this.serviceIdInts = extractUsefulServiceIdInts(args, this, true);
 		super.start(args);
-		System.out.printf("\nGenerating RiverCities Transit bus data... DONE in %s.\n", Utils.getPrettyDuration(System.currentTimeMillis() - start));
+		MTLog.log("Generating RiverCities Transit bus data... DONE in %s.", Utils.getPrettyDuration(System.currentTimeMillis() - start));
 	}
 
 	@Override
 	public boolean excludingAll() {
-		return this.serviceIds != null && this.serviceIds.isEmpty();
+		return this.serviceIdInts != null && this.serviceIdInts.isEmpty();
 	}
 
 	@Override
-	public boolean excludeCalendar(GCalendar gCalendar) {
-		if (this.serviceIds != null) {
-			return excludeUselessCalendar(gCalendar, this.serviceIds);
+	public boolean excludeCalendar(@NotNull GCalendar gCalendar) {
+		if (this.serviceIdInts != null) {
+			return excludeUselessCalendarInt(gCalendar, this.serviceIdInts);
 		}
 		return super.excludeCalendar(gCalendar);
 	}
 
 	@Override
-	public boolean excludeCalendarDate(GCalendarDate gCalendarDates) {
-		if (this.serviceIds != null) {
-			return excludeUselessCalendarDate(gCalendarDates, this.serviceIds);
+	public boolean excludeCalendarDate(@NotNull GCalendarDate gCalendarDates) {
+		if (this.serviceIdInts != null) {
+			return excludeUselessCalendarDateInt(gCalendarDates, this.serviceIdInts);
 		}
 		return super.excludeCalendarDate(gCalendarDates);
 	}
 
 	@Override
-	public boolean excludeTrip(GTrip gTrip) {
-		if (this.serviceIds != null) {
-			return excludeUselessTrip(gTrip, this.serviceIds);
+	public boolean excludeTrip(@NotNull GTrip gTrip) {
+		if (this.serviceIdInts != null) {
+			return excludeUselessTripInt(gTrip, this.serviceIdInts);
 		}
 		return super.excludeTrip(gTrip);
 	}
 
+	@NotNull
 	@Override
 	public Integer getAgencyRouteType() {
 		return MAgency.ROUTE_TYPE_BUS;
 	}
 
 	@Override
-	public long getRouteId(GRoute gRoute) {
+	public long getRouteId(@NotNull GRoute gRoute) {
 		return Long.parseLong(gRoute.getRouteShortName()); // using route short name as route ID
 	}
 
+	@NotNull
 	@Override
-	public String getRouteLongName(GRoute gRoute) {
+	public String getRouteLongName(@NotNull GRoute gRoute) {
 		if (StringUtils.isEmpty(gRoute.getRouteLongName())) {
 			return "Route " + gRoute.getRouteShortName();
 		}
@@ -103,6 +109,7 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 
 	private static final String AGENCY_COLOR = AGENCY_COLOR_BLUE;
 
+	@NotNull
 	@Override
 	public String getAgencyColor() {
 		return AGENCY_COLOR;
@@ -117,10 +124,11 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 	private static final String THREE_RIVERS_MALL = "Three Rivers Mall";
 	private static final String TRANSIT_CENTER = "Transit Ctr";
 
-	private static HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
+	private static final HashMap<Long, RouteTripSpec> ALL_ROUTE_TRIPS2;
 
 	static {
 		HashMap<Long, RouteTripSpec> map2 = new HashMap<>();
+		//noinspection deprecation
 		map2.put(30L, new RouteTripSpec(30L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, "Ocean Beach") //
@@ -137,6 +145,7 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 								"770554" // Ocean Beach Hwy & 28th =>
 						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(31L, new RouteTripSpec(31L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, RA_LONG_HS) //
@@ -145,24 +154,26 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList("770744", "770634", "770656")) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(32L, new RouteTripSpec(32L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, FRED_MEYER) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
 						Arrays.asList(
-							"770700", // 30th  & Larch <=
-							"770699", // 30th & Maryland <=
-							"770707", // ++
-							"770744" // Transit Center
-							)) //
+								"770700", // 30th  & Larch <=
+								"770699", // 30th & Maryland <=
+								"770707", // ++
+								"770744" // Transit Center
+						)) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList(
-							"770744", // Transit Center
-							"770688", // ++
-							"770699", // 30th & Maryland =>
-							"770700" // 30th  & Larch =>
-							)) //
+								"770744", // Transit Center
+								"770688", // ++
+								"770699", // 30th & Maryland =>
+								"770700" // 30th  & Larch =>
+						)) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(33L, new RouteTripSpec(33L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HERON_POINTE) //
@@ -171,6 +182,7 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList("770744", "770732", "770561")) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(44L, new RouteTripSpec(44L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, HERON) //
@@ -179,6 +191,7 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList("770567", "770573", "770561")) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(45L, new RouteTripSpec(45L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, TRANSIT_CENTER) //
@@ -187,6 +200,7 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList("770567", "770585", "770744")) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(56L, new RouteTripSpec(56L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, THREE_RIVERS_MALL, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND) //
@@ -195,50 +209,53 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList("770568", "770615", "770567")) //
 				.compileBothTripSort());
+		//noinspection deprecation
 		map2.put(57L, new RouteTripSpec(57L, //
 				MDirectionType.EAST.intValue(), MTrip.HEADSIGN_TYPE_STRING, AMTRAK_GREYHOUND, //
 				MDirectionType.WEST.intValue(), MTrip.HEADSIGN_TYPE_STRING, KELSO_HIGH_SCHOOL) //
 				.addTripSort(MDirectionType.EAST.intValue(), //
 						Arrays.asList(
-							"770636", // <=
-							"770649", // ==
-							"770592", // !=
-							"770650", // !=
-							"770651", // ==
-							"770685", // Washington Way & 9th Ave
-							"770567" // Amtrak/Greyhound
-							)) //
+								"770636", // <=
+								"770649", // ==
+								"770592", // !=
+								"770650", // !=
+								"770651", // ==
+								"770685", // Washington Way & 9th Ave
+								"770567" // Amtrak/Greyhound
+						)) //
 				.addTripSort(MDirectionType.WEST.intValue(), //
 						Arrays.asList(
-							"770567", // Amtrak/Greyhound
-							"770632", // Mill  & 8th
-							"770569", // ==
-							"781805", // !=
-							"808184", // !=
-							"770636" // =>
-							)) //
+								"770567", // Amtrak/Greyhound
+								"770632", // Mill  & 8th
+								"770569", // ==
+								"781805", // !=
+								"808184", // !=
+								"770636" // =>
+						)) //
 				.compileBothTripSort());
 		ALL_ROUTE_TRIPS2 = map2;
 	}
 
 	@Override
-	public int compareEarly(long routeId, List<MTripStop> list1, List<MTripStop> list2, MTripStop ts1, MTripStop ts2, GStop ts1GStop, GStop ts2GStop) {
+	public int compareEarly(long routeId, @NotNull List<MTripStop> list1, @NotNull List<MTripStop> list2, @NotNull MTripStop ts1, @NotNull MTripStop ts2, @NotNull GStop ts1GStop, @NotNull GStop ts2GStop) {
 		if (ALL_ROUTE_TRIPS2.containsKey(routeId)) {
 			return ALL_ROUTE_TRIPS2.get(routeId).compare(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop, this);
 		}
 		return super.compareEarly(routeId, list1, list2, ts1, ts2, ts1GStop, ts2GStop);
 	}
 
+	@NotNull
 	@Override
-	public ArrayList<MTrip> splitTrip(MRoute mRoute, GTrip gTrip, GSpec gtfs) {
+	public ArrayList<MTrip> splitTrip(@NotNull MRoute mRoute, @Nullable GTrip gTrip, @NotNull GSpec gtfs) {
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return ALL_ROUTE_TRIPS2.get(mRoute.getId()).getAllTrips();
 		}
 		return super.splitTrip(mRoute, gTrip, gtfs);
 	}
 
+	@NotNull
 	@Override
-	public Pair<Long[], Integer[]> splitTripStop(MRoute mRoute, GTrip gTrip, GTripStop gTripStop, ArrayList<MTrip> splitTrips, GSpec routeGTFS) {
+	public Pair<Long[], Integer[]> splitTripStop(@NotNull MRoute mRoute, @NotNull GTrip gTrip, @NotNull GTripStop gTripStop, @NotNull ArrayList<MTrip> splitTrips, @NotNull GSpec routeGTFS) {
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return SplitUtils.splitTripStop(mRoute, gTrip, gTripStop, routeGTFS, ALL_ROUTE_TRIPS2.get(mRoute.getId()), this);
 		}
@@ -246,33 +263,34 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 	}
 
 	@Override
-	public void setTripHeadsign(MRoute mRoute, MTrip mTrip, GTrip gTrip, GSpec gtfs) {
+	public void setTripHeadsign(@NotNull MRoute mRoute, @NotNull MTrip mTrip, @NotNull GTrip gTrip, @NotNull GSpec gtfs) {
 		if (ALL_ROUTE_TRIPS2.containsKey(mRoute.getId())) {
 			return; // split
 		}
-		final int directionId = gTrip.getDirectionId() == null ? 0 : gTrip.getDirectionId();
-		mTrip.setHeadsignString(cleanTripHeadsign(gTrip.getTripHeadsign()), directionId);
+		mTrip.setHeadsignString(
+				cleanTripHeadsign(gTrip.getTripHeadsignOrDefault()),
+				gTrip.getDirectionId() == null ? 0 : gTrip.getDirectionId()
+		);
 	}
 
 	@Override
-	public boolean mergeHeadsign(MTrip mTrip, MTrip mTripToMerge) {
-		System.out.printf("\nUnexpected trips to merge: %s & %s!\n", mTrip, mTripToMerge);
-		System.exit(-1);
-		return false;
+	public boolean mergeHeadsign(@NotNull MTrip mTrip, @NotNull MTrip mTripToMerge) {
+		throw new MTLog.Fatal("Unexpected trips to merge: %s & %s!", mTrip, mTripToMerge);
 	}
 
+	@NotNull
 	@Override
-	public String cleanTripHeadsign(String tripHeadsign) {
+	public String cleanTripHeadsign(@NotNull String tripHeadsign) {
 		tripHeadsign = CleanUtils.cleanSlashes(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanNumbers(tripHeadsign);
 		tripHeadsign = CleanUtils.cleanStreetTypes(tripHeadsign);
 		return CleanUtils.cleanLabel(tripHeadsign);
 	}
 
+	@NotNull
 	@Override
-	public String cleanStopName(String gStopName) {
+	public String cleanStopName(@NotNull String gStopName) {
 		gStopName = CleanUtils.cleanSlashes(gStopName);
-		gStopName = CleanUtils.removePoints(gStopName);
 		gStopName = CleanUtils.cleanStreetTypes(gStopName);
 		return CleanUtils.cleanLabel(gStopName);
 	}

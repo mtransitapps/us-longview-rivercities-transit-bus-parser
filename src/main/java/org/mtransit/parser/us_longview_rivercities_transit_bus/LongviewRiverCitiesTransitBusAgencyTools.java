@@ -274,6 +274,11 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 	}
 
 	@Override
+	public boolean directionFinderEnabled() {
+		return false; // DISABLED because direction_id NOT provided
+	}
+
+	@Override
 	public boolean mergeHeadsign(@NotNull MTrip mTrip, @NotNull MTrip mTripToMerge) {
 		throw new MTLog.Fatal("Unexpected trips to merge: %s & %s!", mTrip, mTripToMerge);
 	}

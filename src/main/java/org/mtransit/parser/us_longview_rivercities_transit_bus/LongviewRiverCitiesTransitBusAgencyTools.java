@@ -1,8 +1,11 @@
 package org.mtransit.parser.us_longview_rivercities_transit_bus;
 
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
+import org.mtransit.commons.CharUtils;
 import org.mtransit.commons.CleanUtils;
 import org.mtransit.commons.StringUtils;
+import org.mtransit.parser.MTLog;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.mt.data.MAgency;
@@ -36,7 +39,23 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 
 	@Override
 	public long getRouteId(@NotNull GRoute gRoute) {
-		return Long.parseLong(gRoute.getRouteShortName()); // using route short name as route ID
+		String rsnS = gRoute.getRouteShortName();
+		if (rsnS.isEmpty()) {
+			rsnS = gRoute.getRouteLongNameOrDefault();
+		}
+		if (rsnS.isEmpty() || !CharUtils.isDigitsOnly(rsnS)) {
+			throw new MTLog.Fatal("Unexpected route ID for %s!", gRoute.toStringPlus());
+		}
+		return Long.parseLong(rsnS); // using route short name as route ID
+	}
+
+	@Nullable
+	@Override
+	public String getRouteShortName(@NotNull GRoute gRoute) {
+		if (StringUtils.isEmpty(gRoute.getRouteShortName())) {
+			return gRoute.getRouteLongNameOrDefault();
+		}
+		return super.getRouteShortName(gRoute);
 	}
 
 	@NotNull

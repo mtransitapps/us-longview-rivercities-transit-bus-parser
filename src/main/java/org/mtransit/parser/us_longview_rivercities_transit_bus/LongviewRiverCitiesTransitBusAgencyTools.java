@@ -1,15 +1,16 @@
 package org.mtransit.parser.us_longview_rivercities_transit_bus;
 
+import static org.mtransit.commons.Constants.EMPTY;
+
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.mtransit.commons.CharUtils;
 import org.mtransit.commons.CleanUtils;
-import org.mtransit.commons.StringUtils;
-import org.mtransit.parser.MTLog;
 import org.mtransit.parser.DefaultAgencyTools;
 import org.mtransit.parser.gtfs.data.GRoute;
 import org.mtransit.parser.mt.data.MAgency;
 
+import java.util.List;
+import java.util.Locale;
 import java.util.regex.Pattern;
 
 // http://data.trilliumtransit.com/gtfs/rivercitiestransit-wa-us/
@@ -18,6 +19,12 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 
 	public static void main(@NotNull String[] args) {
 		new LongviewRiverCitiesTransitBusAgencyTools().start(args);
+	}
+
+	@Nullable
+	@Override
+	public List<Locale> getSupportedLanguages() {
+		return LANG_EN;
 	}
 
 	@NotNull
@@ -38,33 +45,38 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 	}
 
 	@Override
-	public long getRouteId(@NotNull GRoute gRoute) {
-		String rsnS = gRoute.getRouteShortName();
-		if (rsnS.isEmpty()) {
-			rsnS = gRoute.getRouteLongNameOrDefault();
-		}
-		if (rsnS.isEmpty() || !CharUtils.isDigitsOnly(rsnS)) {
-			throw new MTLog.Fatal("Unexpected route ID for %s!", gRoute.toStringPlus());
-		}
-		return Long.parseLong(rsnS); // using route short name as route ID
+	public boolean defaultRouteIdEnabled() {
+		return true;
 	}
 
-	@Nullable
 	@Override
-	public String getRouteShortName(@NotNull GRoute gRoute) {
-		if (StringUtils.isEmpty(gRoute.getRouteShortName())) {
-			return gRoute.getRouteLongNameOrDefault();
-		}
-		return super.getRouteShortName(gRoute);
+	public boolean useRouteShortNameForRouteId() {
+		return true;
 	}
 
 	@NotNull
 	@Override
-	public String getRouteLongName(@NotNull GRoute gRoute) {
-		if (StringUtils.isEmpty(gRoute.getRouteLongName())) {
-			return "Route " + gRoute.getRouteShortName();
-		}
-		return super.getRouteLongName(gRoute);
+	public String provideMissingRouteShortName(@NotNull GRoute gRoute) {
+		return gRoute.getRouteLongNameOrDefault();
+	}
+
+	@Override
+	public boolean defaultRouteLongNameEnabled() {
+		return true;
+	}
+
+	private static final Pattern DIGITS_ONLY = Pattern.compile("(^\\d+$)");
+
+	@NotNull
+	@Override
+	public String cleanRouteLongName(@NotNull String routeLongName) {
+		routeLongName = DIGITS_ONLY.matcher(routeLongName).replaceAll(EMPTY);
+		return CleanUtils.cleanLabel(routeLongName);
+	}
+
+	@Override
+	public boolean defaultAgencyColorEnabled() {
+		return true;
 	}
 
 	private static final String AGENCY_COLOR_BLUE = "0E4878"; // BLUE (from web site CSS)

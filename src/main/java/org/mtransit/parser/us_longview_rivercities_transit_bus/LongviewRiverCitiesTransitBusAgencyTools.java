@@ -54,6 +54,15 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 		return true;
 	}
 
+	@Nullable
+	@Override
+	public Long convertRouteIdFromShortNameNotSupported(@NotNull String routeShortName) {
+		switch(routeShortName) {
+			case "LIFT": return 10_000L;
+		}
+		return null;
+	}
+
 	@NotNull
 	@Override
 	public String provideMissingRouteShortName(@NotNull GRoute gRoute) {

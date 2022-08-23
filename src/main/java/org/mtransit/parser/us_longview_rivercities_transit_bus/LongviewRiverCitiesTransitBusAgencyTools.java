@@ -59,6 +59,7 @@ public class LongviewRiverCitiesTransitBusAgencyTools extends DefaultAgencyTools
 	public Long convertRouteIdFromShortNameNotSupported(@NotNull String routeShortName) {
 		switch(routeShortName) {
 			case "LIFT": return 10_000L;
+			case "NCC": return 11_000L;
 		}
 		return null;
 	}
